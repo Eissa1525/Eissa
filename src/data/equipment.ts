@@ -1,3 +1,5 @@
+import { asset } from './assets';
+
 /**
  * Showroom line-up. Every entry is a real downloaded GLB from the CC0
  * "Gym and Fitness Studio" pack (3dassets.dev). Dimensions come from the pack manifest.
@@ -15,7 +17,7 @@ export type Equipment = {
   zone: 'Free weights' | 'Rigs & racks' | 'Machines' | 'Engine room';
 };
 
-export const equipment: Equipment[] = [
+const list: Equipment[] = [
   { id: 'rack', name: 'CAGE / R4', kind: 'Four-post power rack', model: '/models/power-rack.glb', size: [2.04, 2.32, 1.5], triangles: 4760, zone: 'Rigs & racks',
     blurb: 'A 2.3 m four-post rack with numbered hole patterns, a knurled pull-up bar, J-hooks and full-length safety arms, shown with a bar racked at working height.' },
   { id: 'barbell', name: 'VOID BAR 01', kind: 'Olympic barbell, loaded', model: '/models/barbell-loaded.glb', size: [2.98, 0.45, 0.45], triangles: 2976, zone: 'Free weights',
@@ -41,3 +43,5 @@ export const equipment: Equipment[] = [
   { id: 'bench', name: 'INCLINE / A', kind: 'Adjustable bench, inclined', model: '/models/bench-incline.glb', size: [0.46, 0.75, 1.04], triangles: 1840, zone: 'Free weights',
     blurb: 'An adjustable bench with its back section set to a 45° incline on the ladder bracket.' },
 ];
+
+export const equipment: Equipment[] = list.map((e) => ({ ...e, model: asset(e.model) }));

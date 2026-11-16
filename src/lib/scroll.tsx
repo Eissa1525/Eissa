@@ -48,7 +48,7 @@ export function ScrollProvider({ children }: { children: ReactNode }) {
       if (id.length < 2 || !document.querySelector(id)) return;
       e.preventDefault();
       api.scrollTo(id);
-      history.replaceState(null, '', id);
+      try { history.replaceState(null, '', id); } catch { /* sandboxed frames may refuse history writes */ }
     };
     document.addEventListener('click', onClick);
     return () => document.removeEventListener('click', onClick);

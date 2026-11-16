@@ -3,12 +3,15 @@
  * Files are in /public — swap a file or point a path somewhere else.
  * Licences and sources for each file: see ASSET_CREDITS.md.
  */
+/** Resolves a /public path against the deploy base ("/" by default, "./" for sub-path hosting). */
+export const asset = (path: string) => import.meta.env.BASE_URL + path.replace(/^\//, '');
+
 const img = (id: string, alt: string) => ({
-  src: `/media/img/${id}-1600.webp`,
-  srcSet: `/media/img/${id}-800.webp 800w, /media/img/${id}-1600.webp 1600w`,
+  src: asset(`/media/img/${id}-1600.webp`),
+  srcSet: `${asset(`/media/img/${id}-800.webp`)} 800w, ${asset(`/media/img/${id}-1600.webp`)} 1600w`,
   alt,
 });
-const vid = (name: string) => ({ src: `/media/video/${name}.mp4`, poster: `/media/video/${name}-poster.webp` });
+const vid = (name: string) => ({ src: asset(`/media/video/${name}.mp4`), poster: asset(`/media/video/${name}-poster.webp`) });
 
 export type Img = ReturnType<typeof img>;
 export type Vid = ReturnType<typeof vid>;
@@ -38,9 +41,9 @@ export const media = {
     barbellFloor: img('27810163', 'Barbell with bumper plates on black rubber flooring'),
     ropesLow: img('12890811', 'Athlete in a low stance working battle ropes'),
   },
-  hdr: '/hdr/empty_warehouse_01_1k.hdr',
+  hdr: asset('/hdr/empty_warehouse_01_1k.hdr'),
   models: {
-    hero: '/models/barbell-loaded.glb',
-    floor: '/models/gym-floor.glb',
+    hero: asset('/models/barbell-loaded.glb'),
+    floor: asset('/models/gym-floor.glb'),
   },
 };
