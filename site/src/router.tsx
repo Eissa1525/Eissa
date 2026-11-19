@@ -12,7 +12,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: 'work', lazy: async () => ({ Component: (await import('./pages/Work')).default }) },
       { path: 'work/:slug', lazy: async () => ({ Component: (await import('./pages/CaseStudy')).default }) },
-      { path: 'studio', lazy: async () => ({ Component: (await import('./pages/Studio')).default }) },
+      { path: 'about', lazy: async () => ({ Component: (await import('./pages/About')).default }) },
       { path: 'contact', lazy: async () => ({ Component: (await import('./pages/Contact')).default }) },
       { path: '*', lazy: async () => ({ Component: (await import('./pages/NotFound')).default }) },
     ],

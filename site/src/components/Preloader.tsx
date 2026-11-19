@@ -73,24 +73,24 @@ export default function Preloader() {
   return (
     <div
       ref={root}
-      className="fixed inset-0 z-[110] flex flex-col justify-between bg-obsidian p-[var(--pad)] text-platinum [clip-path:inset(0_0_0_0)]"
+      className="fixed inset-0 z-[110] flex flex-col justify-between bg-ink p-[var(--pad)] text-fg [clip-path:inset(0_0_0_0)]"
       role="status"
       aria-live="polite"
-      aria-label="Loading AETHER"
+      aria-label="Loading"
     >
-      <div className="pre-meta label flex justify-between text-mist">
-        <span>{site.studio}</span>
-        <span>Project {site.codename}</span>
+      <div className="pre-meta label flex justify-between text-faint">
+        <span className="flex items-center gap-2"><i className="dot" /> {site.studio}</span>
+        <span>Loading dossier</span>
       </div>
       <div className="overflow-hidden text-center">
-        <div className="pre-word display-wide text-metal whitespace-nowrap text-[clamp(2.4rem,13vw,13rem)] leading-[0.9]">{site.brand}</div>
+        <div className="pre-word display whitespace-nowrap text-[clamp(4rem,22vw,22rem)] leading-[0.82]"><span className="outline-text">{site.alias[0]}</span><span className="text-accent">{site.alias[1]}</span></div>
       </div>
-      <div className="pre-meta label flex items-center gap-4 text-mist">
-        <span ref={num} className="w-10 text-platinum">000</span>
+      <div className="pre-meta label flex items-center gap-4 text-faint">
+        <span ref={num} className="w-10 text-accent">000</span>
         <span className="pre-bar relative h-px flex-1 bg-line">
-          <i className="absolute inset-0 origin-left scale-x-0 bg-platinum" />
+          <i className="absolute inset-0 origin-left scale-x-0 bg-accent" />
         </span>
-        <button type="button" onClick={leave} className="roll text-platinum" data-text="Skip intro">
+        <button type="button" onClick={leave} className="roll text-fg" data-text="Skip intro">
           <span>Skip intro</span>
         </button>
       </div>

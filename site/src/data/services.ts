@@ -1,26 +1,31 @@
+// Abilities shown in the "Abilities" section (scores feed the radar).
 export const services = [
   {
     n: '01',
-    title: 'Website design',
-    body: 'Editorial, cinematic websites built around one clear story — not a template with your logo on it.',
-    items: ['Art direction', 'UX & information architecture', 'Interface design', 'Design systems'],
+    title: 'Brand identity',
+    body: 'Names, marks and the rules that keep a brand recognisable at any size and on any surface.',
+    items: ['Strategy', 'Logo systems', 'Typography', 'Guidelines'],
+    scores: [88, 92, 60, 84, 70],
   },
   {
     n: '02',
-    title: 'Creative development',
-    body: 'Production-grade React and WebGL engineering, with performance and accessibility treated as craft.',
-    items: ['React / TypeScript', 'GSAP & scroll choreography', 'CMS integration', 'Performance'],
+    title: 'Websites',
+    body: 'Sites that explain the product in one scroll — designed to be built without a translator.',
+    items: ['UX', 'Interface', 'Prototyping', 'Handoff'],
+    scores: [76, 86, 82, 78, 90],
   },
   {
     n: '03',
-    title: '3D experiences',
-    body: 'Real-time scenes, product configurators and spatial storytelling that run in the browser.',
-    items: ['Three.js / R3F', 'Custom shaders', 'Product visualization', 'Interactive installations'],
+    title: 'Motion',
+    body: 'Logos, interfaces and launch moments that move with intent instead of decoration.',
+    items: ['Motion language', 'Launch films', 'Micro-interaction'],
+    scores: [64, 84, 96, 70, 80],
   },
   {
     n: '04',
-    title: 'Motion & identity',
-    body: 'Brand systems designed to move — logos, typography and transitions that behave consistently.',
-    items: ['Brand identity', 'Motion language', 'Launch films', 'Micro-interactions'],
+    title: 'Art direction',
+    body: 'Photography, 3D and campaign assets that make a small company look exactly as good as its product.',
+    items: ['Photo direction', '3D', 'Campaign'],
+    scores: [80, 94, 74, 66, 72],
   },
 ]

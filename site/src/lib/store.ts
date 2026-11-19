@@ -1,6 +1,7 @@
 // Shared mutable state between DOM (GSAP) and WebGL (useFrame) — never triggers React renders.
 export const scroll = {
-  eclipse: 0, // 0..1 progress of the Eclipse sequence
+  hero: 0, // 0..1 suit-up progress
+  tunnel: 0, // 0..1 case-files tunnel progress
   velocity: 0, // Lenis velocity
   intro: 0, // 0..1 light-up after preloader
 }

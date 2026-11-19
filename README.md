@@ -1,6 +1,7 @@
-# AETHER STUDIO — Project ECLIPSE
+# EISSA — ALTER/EGO portfolio
 
-A cinematic creative-studio site: React 19 · TypeScript · Vite · Tailwind v4 · GSAP (ScrollTrigger, SplitText, Flip) · Lenis · Three.js / React Three Fiber · postprocessing · Motion · React Bits.
+Cinematic designer portfolio inspired by the *feel* of the Framer “Alter Ego” template (inspected live in a browser),
+rebuilt from scratch in React with real WebGL — no Framer code, images or copy reused.
 
 ```bash
 cd site
@@ -11,51 +12,29 @@ npm run preview      # serve the build on :4173
 npm run test:e2e     # browser QA (needs preview running)
 ```
 
-## Phase 0 — reference audit (honest scope)
-| Reference | Access from the build environment | Used |
+## Your two photos (hero transformation)
+1. Put them in `site/public/hero/`, e.g. `me.jpg` and `me-suited.jpg` — **same pose, same framing**, portrait (3:4), subject centred, dark background works best.
+2. In `site/src/data/site.ts` set:
+   ```ts
+   portraits: { civilian: '/hero/me.jpg', suited: '/hero/me-suited.jpg' }
+   ```
+Until then, procedural placeholder figures are used. The civilian photo is graded to black & white automatically.
+
+## Sections (home)
+| Section | What it does | Beyond the reference |
 |---|---|---|
-| framer.com/…/alter-ego, alter.framer.photos | **blocked** (network policy) | Only the public marketplace description: scroll-driven hero, portrait transformation, 3D project tunnel, glitch footer. Nothing copied — the Eclipse concept, tunnel and glitch footer are deliberately avoided. |
-| horizonx.so, motionsite.ai, Aceternity, Motion Primitives | **blocked** | Not used. |
-| React Bits | site blocked, **GitHub source reachable** | `SpotlightCard`, `GlareHover` (+ `ShinyText`, `DecryptedText` vendored for later phases) in `src/components/vendor/reactbits` under its MIT + Commons Clause license (use inside a website is permitted). |
+| Hero — suit-up | Scroll drives an ignition scan line that converts the civilian portrait into the suited one; name decodes into the alias; SYNC % and STATE HUD | Single WebGL shader: glitch slicing + chromatic split in the scan band, contour lines that ignite near the line, sparks, mouse parallax |
+| Origin | Scroll-lit paragraph with orange emphasis + journey line | Driven from one editable string (`*emphasis*`) |
+| Case files | Pinned 3D tunnel of nested frames; projects on curved CRT screens; titles decode | Real R3F scene: velocity-reactive bend + RGB split, warp streaks, click a screen to open the case study |
+| Abilities | Ability list + radar | Radar morphs between abilities, rotating scan sweep, auto-cycle, keyboard accessible |
+| Transmit | Huge contact headline that burns under the cursor | Pixel heat-field burn with embers; autonomous probe so touch devices see it too |
 
-## Architecture
-```
-site/src
-├─ data/          ← ALL editable content (site.ts, projects.ts, services.ts, process.ts)
-├─ styles/        ← design tokens (@theme) + base/components layers
-├─ animations/    ← gsap registration, motion tokens, useReveal (declarative data-reveal system)
-├─ scenes/eclipse ← Eclipse WebGL scene, procedural shard geometry, CSS fallback
-├─ shaders/       ← shard vertex/material injection, corona shader
-├─ sections/home  ← EclipseHero, SelectedWork, Manifesto, ServicesPreview, Process, ContactCTA
-├─ pages/         ← Home, Work, CaseStudy (/work/:slug), Studio, Contact, NotFound (code-split)
-├─ layouts/       ← RootLayout: Lenis, preloader, nav, page-transition curtain, footer
-├─ components/    ← Nav (+ mobile menu), Preloader, Cursor, Magnetic, DeviceMockup, vendor/
-├─ hooks/ lib/    ← media queries, WebGL detection, shared scroll store, loading registry, covers
-└─ tests/qa.cjs   ← Playwright QA
-```
-
-## The Eclipse Sequence
-One pinned ScrollTrigger (scrub) drives both the DOM timeline and the WebGL uniforms — reverse scrolling replays exactly.
-1. **Origin** — a fractured geodesic sculpture (1 280 prism shards on desktop, 320 on mobile) emerges as a key light rises after the preloader.
-2. **Awakening** — shards separate into three counter-rotating orbital bands; a band of light sweeps through the geometry.
-3. **Formation** — shards lock onto a torus halo; the material shifts from rough obsidian to platinum with dark-violet glass facets (MeshPhysicalMaterial + procedural Lightformer environment, no HDR download).
-4. **Eclipse** — a corona ignites around the dark disc, the halo scales up and the camera flies through it into darkness → Selected Work.
-
-All shard motion runs on the GPU (vertex-shader injection). Fallbacks: `prefers-reduced-motion` and no-WebGL → static CSS eclipse; any scene error → same fallback via ErrorBoundary. DPR is capped (1.75 desktop / 1.25 mobile); the 3D chunk is lazy-loaded and its download + first frame feed the preloader's real progress.
+Pages: `/work`, `/work/:slug` (case study), `/about`, `/contact`, 404. Reduced motion and no-WebGL get static versions.
 
 ## Editing content
-- Brand, contact, SEO, nav: `src/data/site.ts`. **Contact fields left empty are hidden** — `studio@example.com` is a reserved placeholder: replace it. Add `whatsapp`, `sms`, `telegram` to enable those written channels.
-- Projects: `src/data/projects.ts` — the six projects are **sample concept work**; add a `cover` image path to replace the generated artwork.
+- `site/src/data/site.ts` — name, alias, bio, origin text, photos, contact (empty fields are hidden; `hello@example.com` is a placeholder).
+- `site/src/data/projects.ts` — sample concept projects (replace; add `cover` image paths).
+- `site/src/data/services.ts` — abilities + radar scores.
 
 ## Deployment
-Static SPA. `vercel.json` and `public/_redirects` (Netlify) rewrite all routes to `index.html`.
-
-## Status
-| Phase | State |
-|---|---|
-| 0 Audit | done (within access limits above) |
-| 1 Foundation | done — tokens, routes, nav/mobile menu, Lenis, transitions, content config |
-| 2 Eclipse hero | done — verified desktop/mobile/reduced-motion |
-| 3 Immersive portfolio | partial — editorial exhibition + case studies work; spatial orbital gallery still to build |
-| 4 Complete site | partial — manifesto, services, process, studio, contact done; **Experimental Showcase not built yet** |
-| 5–7 | pending: motion polish, real-device performance testing, image optimisation |
+Static SPA — `vercel.json` / `public/_redirects` rewrite all routes to `index.html`.

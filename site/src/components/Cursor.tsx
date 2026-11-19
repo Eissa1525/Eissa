@@ -22,11 +22,11 @@ export default function Cursor() {
     const setState = (text: string | null) => {
       if (text) {
         label.current!.textContent = text
-        gsap.to(r, { scale: 1, width: 96, height: 96, backgroundColor: '#e4e2ec', borderColor: '#e4e2ec', duration: 0.4, ease: 'out-expo' })
+        gsap.to(r, { scale: 1, width: 96, height: 96, backgroundColor: '#ff5a1f', borderColor: '#ff5a1f', duration: 0.4, ease: 'out-expo' })
         gsap.to(label.current, { autoAlpha: 1, duration: 0.25 })
         gsap.to(d, { scale: 0, duration: 0.2 })
       } else {
-        gsap.to(r, { width: 36, height: 36, backgroundColor: 'rgba(0,0,0,0)', borderColor: 'rgba(228,226,236,.5)', duration: 0.4, ease: 'out-expo' })
+        gsap.to(r, { width: 36, height: 36, backgroundColor: 'rgba(0,0,0,0)', borderColor: 'rgba(237,237,240,.45)', duration: 0.4, ease: 'out-expo' })
         gsap.to(label.current, { autoAlpha: 0, duration: 0.15 })
         gsap.to(d, { scale: 1, duration: 0.2 })
       }

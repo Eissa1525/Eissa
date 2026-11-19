@@ -4,11 +4,11 @@ const { chromium } = require('playwright');
 const ARGS = ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'];
 const BASE = process.env.BASE_URL || 'http://localhost:4173';
 const out = process.argv[2] || 'tests/screenshots'; require('fs').mkdirSync(out, { recursive: true });
-const ROUTES = ['/', '/work', '/work/meridian-os', '/studio', '/contact'];
+const ROUTES = ['/', '/work', '/work/meridian-os', '/about', '/contact'];
 (async () => {
   const b = await chromium.launch({ args: ARGS });
   const report = [];
-  const ready = (p) => p.waitForFunction(() => document.querySelector('#main') && !document.querySelector('[aria-label="Loading AETHER"]'), null, { timeout: 25000 });
+  const ready = (p) => p.waitForFunction(() => document.querySelector('#main') && !document.querySelector('[aria-label="Loading"]'), null, { timeout: 25000 });
 
   // 1. desktop hero re-check
   {
@@ -48,7 +48,7 @@ const ROUTES = ['/', '/work', '/work/meridian-os', '/studio', '/contact'];
       await p.keyboard.press('Escape'); await p.waitForTimeout(900);
       const closed = await p.evaluate(() => document.querySelector('#mobile-menu').getAttribute('aria-hidden'));
       await p.click('button[aria-controls="mobile-menu"]'); await p.waitForTimeout(1000);
-      await p.click('#mobile-menu >> text=Studio'); await p.waitForTimeout(2200);
+      await p.click('#mobile-menu >> text=About'); await p.waitForTimeout(2200);
       report.push(`menu: focus on open="${focused}", aria-hidden after Esc=${closed}, navigated to ${new URL(p.url()).pathname}`);
     }
     report.push(`${w}px errors: ${errs.join(' | ') || 'none'}`);
@@ -61,7 +61,7 @@ const ROUTES = ['/', '/work', '/work/meridian-os', '/studio', '/contact'];
     await p.goto(BASE + '/'); await p.waitForTimeout(2000);
     await p.screenshot({ path: `${out}/reduced-home.png` });
     const canvases = await p.evaluate(() => document.querySelectorAll('canvas').length);
-    report.push(`reduced motion: canvases=${canvases}, preloader=${await p.evaluate(() => !!document.querySelector('[aria-label="Loading AETHER"]'))}, errors=${errs.join('|') || 'none'}`);
+    report.push(`reduced motion: canvases=${canvases}, preloader=${await p.evaluate(() => !!document.querySelector('[aria-label="Loading"]'))}, errors=${errs.join('|') || 'none'}`);
     // keyboard
     await p.keyboard.press('Tab'); const f1 = await p.evaluate(() => document.activeElement.textContent.trim());
     const seq = [f1];
@@ -85,7 +85,7 @@ const ROUTES = ['/', '/work', '/work/meridian-os', '/studio', '/contact'];
     for (const h of seen) {
       if (h.startsWith('/')) {
         await p.goto(BASE + h); await p.waitForTimeout(700);
-        if (await p.evaluate(() => document.body.innerText.includes('404 — lost in orbit'))) bad.push(h);
+        if (await p.evaluate(() => document.body.innerText.includes('404 — signal lost'))) bad.push(h);
       } else if (h === '#' || h === '') bad.push('dead:' + h);
     }
     report.push(`links checked: ${[...seen].join(', ')} | broken: ${bad.join(', ') || 'none'}`);

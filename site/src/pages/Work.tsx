@@ -23,12 +23,12 @@ export default function Work() {
                 <ProjectCover project={p} className="transition-transform duration-[1.4s] ease-out-expo group-hover:scale-105" />
               </div>
               <div className="mt-5 flex items-baseline justify-between gap-4 border-b border-line pb-4">
-                <h2 className="display-tight text-h3 leading-none transition-colors group-hover:text-violet-soft">
-                  <span className="label mr-3 align-middle text-mist">{p.index}</span>{p.title}
+                <h2 className="display-tight text-h3 leading-none transition-colors group-hover:text-accent">
+                  <span className="label mr-3 align-middle text-faint">{p.index}</span>{p.title}
                 </h2>
-                <span className="label text-mist">{p.year}</span>
+                <span className="label text-faint">{p.year}</span>
               </div>
-              <p className="label mt-3 text-silver">{p.disciplines.join(' · ')}</p>
+              <p className="label mt-3 text-dim">{p.disciplines.join(' · ')}</p>
             </Link>
           </li>
         ))}

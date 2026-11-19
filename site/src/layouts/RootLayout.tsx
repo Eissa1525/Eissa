@@ -32,7 +32,7 @@ export default function RootLayout() {
 
   return (
     <>
-      <a href="#main" className="label fixed top-2 left-2 z-[200] -translate-y-20 rounded bg-platinum px-3 py-2 text-obsidian focus:translate-y-0">
+      <a href="#main" className="label fixed top-2 left-2 z-[200] -translate-y-20 rounded bg-fg px-3 py-2 text-ink focus:translate-y-0">
         Skip to content
       </a>
       <Preloader />
@@ -51,7 +51,7 @@ export default function RootLayout() {
           <Footer />
           <motion.div
             aria-hidden
-            className="pointer-events-none fixed inset-0 z-[95] bg-charcoal"
+            className="pointer-events-none fixed inset-0 z-[95] bg-panel"
             variants={curtain}
             initial={location.key === 'default' ? false : 'initial'}
             animate="animate"

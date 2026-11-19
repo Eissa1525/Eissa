@@ -1,9 +1,9 @@
-export default function SectionLabel({ n, children }: { n: string; children: React.ReactNode }) {
+export default function SectionLabel({ children, meta }: { children: React.ReactNode; meta?: React.ReactNode }) {
   return (
-    <div className="label flex items-center gap-3 text-mist" data-reveal="fade">
-      <span className="text-violet-soft">{n}</span>
-      <span className="h-px w-8 bg-line-strong" />
-      <span>{children}</span>
+    <div className="hud flex items-center gap-3 text-faint" data-reveal="fade">
+      <span className="text-accent">//</span>
+      <span className="text-fg">{children}</span>
+      {meta && <span>{meta}</span>}
     </div>
   )
 }

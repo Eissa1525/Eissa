@@ -1,19 +1,17 @@
-import EclipseHero from '../sections/home/EclipseHero'
-import SelectedWork from '../sections/home/SelectedWork'
-import Manifesto from '../sections/home/Manifesto'
-import ServicesPreview from '../sections/home/ServicesPreview'
-import Process from '../sections/home/Process'
-import ContactCTA from '../sections/home/ContactCTA'
+import SuitUpHero from '../sections/home/SuitUpHero'
+import OriginStory from '../sections/home/OriginStory'
+import CaseFiles from '../sections/home/CaseFiles'
+import Abilities from '../sections/home/Abilities'
+import Transmit from '../sections/home/Transmit'
 
 export default function Home() {
   return (
     <>
-      <EclipseHero />
-      <SelectedWork />
-      <Manifesto />
-      <ServicesPreview />
-      <Process />
-      <ContactCTA />
+      <SuitUpHero />
+      <OriginStory />
+      <CaseFiles />
+      <Abilities />
+      <Transmit />
     </>
   )
 }

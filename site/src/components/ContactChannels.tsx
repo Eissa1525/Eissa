@@ -9,10 +9,10 @@ export default function ContactChannels({ className = '' }: { className?: string
           <a
             href={c.href}
             {...(c.external ? { target: '_blank', rel: 'noreferrer' } : {})}
-            className="group flex items-baseline justify-between gap-6 py-5 transition-colors hover:text-violet-soft"
+            className="group flex items-baseline justify-between gap-6 py-5 transition-colors hover:text-accent"
             data-cursor="Write"
           >
-            <span className="label text-mist">{c.label}</span>
+            <span className="label text-faint">{c.label}</span>
             <span className="text-lead tracking-tight">{c.value}</span>
             <span aria-hidden className="transition-transform duration-500 group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
           </a>

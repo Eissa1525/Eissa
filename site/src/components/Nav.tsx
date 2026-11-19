@@ -58,13 +58,13 @@ export default function Nav() {
 
   return (
     <>
-      <header ref={root} className="fixed inset-x-0 top-0 z-[80] mix-blend-difference">
-        <div className="shell grid grid-cols-[1fr_auto] items-center py-5 md:grid-cols-[1fr_auto_1fr]">
+      <header ref={root} className="fixed inset-x-0 top-0 z-[80] border-b border-line bg-ink/70 backdrop-blur-md">
+        <div className="shell grid grid-cols-[1fr_auto] items-center py-3.5 md:grid-cols-[1fr_auto_1fr]">
           <Link to="/" className="inline-flex items-center gap-3" aria-label={`${site.studio} — home`}>
-            <span className="relative block size-4 rounded-full border-2 border-platinum after:absolute after:inset-[3px] after:rounded-full after:bg-platinum" />
-            <span className="display-wide text-[0.95rem] tracking-[0.18em]">{site.brand}</span>
+            <span className="dot" />
+            <span className="text-sm font-medium tracking-tight">{site.brand}</span>
           </Link>
-          <div className="label hidden gap-5 text-silver md:flex">
+          <div className="label hidden gap-5 text-faint md:flex">
             <span>{site.location}</span>
             <Clock />
           </div>
@@ -73,7 +73,7 @@ export default function Nav() {
               <Magnetic key={l.to}>
                 <NavLink
                   to={l.to}
-                  className={({ isActive }) => `roll px-3 py-2 text-sm ${isActive ? 'text-violet-soft' : ''}`}
+                  className={({ isActive }) => `roll px-3 py-1.5 text-sm ${isActive ? 'text-accent' : 'text-dim'}`}
                   data-text={l.label}
                 >
                   <span>{l.label}</span>
@@ -91,8 +91,8 @@ export default function Nav() {
           >
             {open ? 'Close' : 'Menu'}
             <span className="relative block h-2 w-5" aria-hidden>
-              <i className={`absolute left-0 h-px w-full bg-platinum transition-transform duration-500 ${open ? 'top-1 rotate-45' : 'top-0'}`} />
-              <i className={`absolute left-0 h-px w-full bg-platinum transition-transform duration-500 ${open ? 'top-1 -rotate-45' : 'top-2'}`} />
+              <i className={`absolute left-0 h-px w-full bg-fg transition-transform duration-500 ${open ? 'top-1 rotate-45' : 'top-0'}`} />
+              <i className={`absolute left-0 h-px w-full bg-fg transition-transform duration-500 ${open ? 'top-1 -rotate-45' : 'top-2'}`} />
             </span>
           </button>
         </div>
@@ -101,22 +101,22 @@ export default function Nav() {
       <div
         ref={menu}
         id="mobile-menu"
-        className="invisible fixed inset-0 z-[70] flex flex-col justify-between bg-charcoal px-[var(--pad)] pt-28 pb-10 md:hidden"
+        className="invisible fixed inset-0 z-[70] flex flex-col justify-between bg-ink px-[var(--pad)] pt-24 pb-10 md:hidden"
         aria-hidden={!open}
         inert={!open}
       >
         <nav aria-label="Mobile" className="flex flex-col gap-2">
           {[{ label: 'Home', to: '/' }, ...site.nav].map((l, i) => (
             <div key={l.to} className="overflow-hidden">
-              <NavLink to={l.to} className="m-item display-tight flex items-baseline gap-4 text-[clamp(2.75rem,13vw,4.5rem)] leading-[1.05]">
-                <span className="label text-mist">0{i + 1}</span>
+              <NavLink to={l.to} className="m-item display flex items-baseline gap-4 text-[clamp(3.5rem,17vw,6rem)] leading-[0.95] aria-[current=page]:text-accent">
+                <span className="label text-faint">0{i + 1}</span>
                 {l.label}
               </NavLink>
             </div>
           ))}
         </nav>
-        <div className="label space-y-2 text-silver">
-          {site.contact.email && <a href={`mailto:${site.contact.email}`} className="block text-platinum">{site.contact.email}</a>}
+        <div className="label space-y-2 text-dim">
+          {site.contact.email && <a href={`mailto:${site.contact.email}`} className="block text-fg">{site.contact.email}</a>}
           <span className="block">{site.location}</span>
         </div>
       </div>

@@ -4,33 +4,20 @@ import Clock from './Clock'
 
 export default function Footer() {
   return (
-    <footer className="shell relative overflow-hidden border-t border-line pt-16 pb-8">
-      <div className="grid gap-10 md:grid-cols-[2fr_1fr_1fr]">
-        <div className="space-y-4">
-          <p className="display-wide text-metal text-[clamp(2.5rem,7vw,6rem)] leading-none">{site.brand}</p>
-          <p className="max-w-sm text-silver">{site.tagline}</p>
-        </div>
-        <nav aria-label="Footer" className="label flex flex-col gap-3">
-          <span className="text-mist">Index</span>
-          <Link to="/" className="roll w-fit" data-text="Home"><span>Home</span></Link>
+    <footer className="shell border-t border-line py-6">
+      <div className="hud flex flex-wrap items-center justify-between gap-x-8 gap-y-4 text-faint">
+        <span>© {site.year} {site.studio}</span>
+        <nav aria-label="Footer" className="flex flex-wrap gap-5">
+          <Link to="/" className="roll" data-text="Home"><span>Home</span></Link>
           {site.nav.map((l) => (
-            <Link key={l.to} to={l.to} className="roll w-fit" data-text={l.label}><span>{l.label}</span></Link>
+            <Link key={l.to} to={l.to} className="roll" data-text={l.label}><span>{l.label}</span></Link>
+          ))}
+          {site.socials.map((s) => (
+            <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="roll" data-text={s.label}><span>{s.label}</span></a>
           ))}
         </nav>
-        <div className="label flex flex-col gap-3">
-          <span className="text-mist">Contact</span>
-          {site.contact.email && <a href={`mailto:${site.contact.email}`} className="roll w-fit" data-text={site.contact.email}><span>{site.contact.email}</span></a>}
-          {site.socials.map((s) => (
-            <a key={s.label} href={s.href} target="_blank" rel="noreferrer" className="roll w-fit" data-text={s.label}><span>{s.label}</span></a>
-          ))}
-          <span className="text-mist">{site.location} — <Clock /></span>
-        </div>
-      </div>
-      <div className="label mt-16 flex flex-wrap justify-between gap-4 text-mist">
-        <span>© {site.year} {site.studio}</span>
-        <button type="button" className="roll" data-text="Back to top ↑" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <span>Back to top ↑</span>
-        </button>
+        <span>{site.location} · <Clock /></span>
+        <button type="button" className="roll" data-text="Top ↑" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}><span>Top ↑</span></button>
       </div>
     </footer>
   )
