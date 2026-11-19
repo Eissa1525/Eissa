@@ -1,41 +1,61 @@
-# EISSA — Alter Ego Portfolio
+# AETHER STUDIO — Project ECLIPSE
 
-موقع بورتفوليو سينمائي (React + GSAP + Three.js) — مستوحى من فكرة "الشخصية البديلة"، مبني من الصفر بتصميم وكود أصلي.
+A cinematic creative-studio site: React 19 · TypeScript · Vite · Tailwind v4 · GSAP (ScrollTrigger, SplitText, Flip) · Lenis · Three.js / React Three Fiber · postprocessing · Motion · React Bits.
 
-## التشغيل
 ```bash
 cd site
 npm install
-npm run dev      # تطوير
-npm run build    # نسخة إنتاج في site/dist
+npm run dev          # development
+npm run build        # production build → site/dist
+npm run preview      # serve the build on :4173
+npm run test:e2e     # browser QA (needs preview running)
 ```
 
-## تعديل المحتوى
-كل النصوص والمشاريع والروابط في ملف واحد: `site/src/content.ts`.
-أغلفة المشاريع حالياً مولّدة برمجياً (`site/src/lib/covers.ts`) — تُستبدل بصورك الحقيقية في المرحلة 2.
+## Phase 0 — reference audit (honest scope)
+| Reference | Access from the build environment | Used |
+|---|---|---|
+| framer.com/…/alter-ego, alter.framer.photos | **blocked** (network policy) | Only the public marketplace description: scroll-driven hero, portrait transformation, 3D project tunnel, glitch footer. Nothing copied — the Eclipse concept, tunnel and glitch footer are deliberately avoided. |
+| horizonx.so, motionsite.ai, Aceternity, Motion Primitives | **blocked** | Not used. |
+| React Bits | site blocked, **GitHub source reachable** | `SpotlightCard`, `GlareHover` (+ `ShinyText`, `DecryptedText` vendored for later phases) in `src/components/vendor/reactbits` under its MIT + Commons Clause license (use inside a website is permitted). |
 
-## المكتبات
-| المكتبة | الاستخدام |
+## Architecture
+```
+site/src
+├─ data/          ← ALL editable content (site.ts, projects.ts, services.ts, process.ts)
+├─ styles/        ← design tokens (@theme) + base/components layers
+├─ animations/    ← gsap registration, motion tokens, useReveal (declarative data-reveal system)
+├─ scenes/eclipse ← Eclipse WebGL scene, procedural shard geometry, CSS fallback
+├─ shaders/       ← shard vertex/material injection, corona shader
+├─ sections/home  ← EclipseHero, SelectedWork, Manifesto, ServicesPreview, Process, ContactCTA
+├─ pages/         ← Home, Work, CaseStudy (/work/:slug), Studio, Contact, NotFound (code-split)
+├─ layouts/       ← RootLayout: Lenis, preloader, nav, page-transition curtain, footer
+├─ components/    ← Nav (+ mobile menu), Preloader, Cursor, Magnetic, DeviceMockup, vendor/
+├─ hooks/ lib/    ← media queries, WebGL detection, shared scroll store, loading registry, covers
+└─ tests/qa.cjs   ← Playwright QA
+```
+
+## The Eclipse Sequence
+One pinned ScrollTrigger (scrub) drives both the DOM timeline and the WebGL uniforms — reverse scrolling replays exactly.
+1. **Origin** — a fractured geodesic sculpture (1 280 prism shards on desktop, 320 on mobile) emerges as a key light rises after the preloader.
+2. **Awakening** — shards separate into three counter-rotating orbital bands; a band of light sweeps through the geometry.
+3. **Formation** — shards lock onto a torus halo; the material shifts from rough obsidian to platinum with dark-violet glass facets (MeshPhysicalMaterial + procedural Lightformer environment, no HDR download).
+4. **Eclipse** — a corona ignites around the dark disc, the halo scales up and the camera flies through it into darkness → Selected Work.
+
+All shard motion runs on the GPU (vertex-shader injection). Fallbacks: `prefers-reduced-motion` and no-WebGL → static CSS eclipse; any scene error → same fallback via ErrorBoundary. DPR is capped (1.75 desktop / 1.25 mobile); the 3D chunk is lazy-loaded and its download + first frame feed the preloader's real progress.
+
+## Editing content
+- Brand, contact, SEO, nav: `src/data/site.ts`. **Contact fields left empty are hidden** — `studio@example.com` is a reserved placeholder: replace it. Add `whatsapp`, `sms`, `telegram` to enable those written channels.
+- Projects: `src/data/projects.ts` — the six projects are **sample concept work**; add a `cover` image path to replace the generated artwork.
+
+## Deployment
+Static SPA. `vercel.json` and `public/_redirects` (Netlify) rewrite all routes to `index.html`.
+
+## Status
+| Phase | State |
 |---|---|
-| GSAP 3.15 (ScrollTrigger, SplitText, ScrambleText, CustomEase) | كل حركات التمرير والنصوص |
-| Lenis | تمرير ناعم متزامن مع ScrollTrigger |
-| Three.js + React Three Fiber + drei | المشهدين ثلاثيي الأبعاد |
-| postprocessing | Bloom, Chromatic Aberration, Noise, Vignette |
-| Motion | جاهزة للمرحلة 2 (انتقالات الصفحات) |
-
-## الأقسام (المرحلة 1 ✅)
-1. Preloader — عدّاد + ستارة
-2. Hero — كرة WebGL بشيدر مخصص تتحول بالتمرير من "الذات" (لؤلؤية ناعمة) إلى "الشخصية البديلة" (أشواك حمراء + wireframe + scanlines)، والاسم يتشفّر إلى ALTER/EGO
-3. Manifesto — كشف الكلمات بالتمرير (نمط ScrollReveal)
-4. Projects Tunnel — نفق 3D تطير فيه الكاميرا بين المشاريع، البطاقات تنحني وتنفصل ألوانها حسب سرعة التمرير
-5. Velocity Marquee — شريط يتسارع ويميل مع سرعة التمرير
-6. Capabilities — تمرير أفقي مثبّت مع بارالاكس داخلي
-7. Work Index — قائمة مع صورة تتبع المؤشر
-8. Recognition — أرقام + جوائز
-9. Footer — نموذج تواصل + اسم ضخم بتأثير Glitch
-+ مؤشر مخصص، أزرار مغناطيسية، حبيبات فيلم، دعم reduced‑motion، وتصميم متجاوب للجوال
-
-## الخارطة
-- **المرحلة 2:** صفحات دراسة حالة لكل مشروع + انتقالات صفحات (Motion/Flip) + صورك الحقيقية
-- **المرحلة 3:** صوت تفاعلي، وضع ليلي/نهاري حقيقي مرتبط بالشخصيتين، تحسين الأداء (KTX2، lazy scenes)
-- **المرحلة 4:** نشر (Vercel/Netlify) + SEO + Open Graph
+| 0 Audit | done (within access limits above) |
+| 1 Foundation | done — tokens, routes, nav/mobile menu, Lenis, transitions, content config |
+| 2 Eclipse hero | done — verified desktop/mobile/reduced-motion |
+| 3 Immersive portfolio | partial — editorial exhibition + case studies work; spatial orbital gallery still to build |
+| 4 Complete site | partial — manifesto, services, process, studio, contact done; **Experimental Showcase not built yet** |
+| 5–7 | pending: motion polish, real-device performance testing, image optimisation |

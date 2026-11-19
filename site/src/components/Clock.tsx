@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { site } from '../content'
+import { site } from '../data/site'
 
 export default function Clock() {
   const fmt = () =>

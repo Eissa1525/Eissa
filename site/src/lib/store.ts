@@ -1,24 +1,34 @@
-// حالة مشتركة بين DOM و WebGL بدون إعادة رسم React (قيم قابلة للتعديل تُقرأ في كل إطار).
+// Shared mutable state between DOM (GSAP) and WebGL (useFrame) — never triggers React renders.
 export const scroll = {
-  hero: 0, // 0..1 تقدم قسم البطل
-  tunnel: 0, // 0..1 تقدم النفق
-  velocity: 0, // سرعة التمرير من Lenis
+  eclipse: 0, // 0..1 progress of the Eclipse sequence
+  velocity: 0, // Lenis velocity
+  intro: 0, // 0..1 light-up after preloader
 }
 
 type Listener = () => void
-const readyListeners = new Set<Listener>()
-let ready = false
-export const appReady = {
-  get value() {
-    return ready
-  },
-  set() {
-    ready = true
-    readyListeners.forEach((l) => l())
-  },
-  on(l: Listener) {
-    if (ready) l()
-    else readyListeners.add(l)
-    return () => readyListeners.delete(l)
-  },
+function signal() {
+  let fired = false
+  const ls = new Set<Listener>()
+  return {
+    get value() { return fired },
+    fire() { if (fired) return; fired = true; ls.forEach((l) => l()) },
+    on(l: Listener) { if (fired) l(); else ls.add(l); return () => { ls.delete(l) } },
+  }
 }
+/** Fires once when the preloader has left the screen. */
+export const appReady = signal()
+
+/** Genuine loading registry: sections register real async work (modules, fonts, first frame). */
+export const loading = (() => {
+  let total = 0
+  let done = 0
+  return {
+    track<T>(p: Promise<T>) {
+      total++
+      p.finally(() => { done++ })
+      return p
+    },
+    get ratio() { return total === 0 ? 0 : done / total },
+    get complete() { return total > 0 && done === total },
+  }
+})()

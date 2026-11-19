@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
-import { gsap, isTouch } from '../lib/gsap'
+import { gsap } from '../animations/gsap'
+import { isTouch } from '../hooks/useMedia'
 
 export default function Magnetic({ children, strength = 0.35 }: { children: ReactNode; strength?: number }) {
   const ref = useRef<HTMLSpanElement>(null)

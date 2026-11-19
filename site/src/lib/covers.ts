@@ -1,132 +1,172 @@
-import type { Project } from '../content'
+import type { Project } from '../data/projects'
 
-// أغلفة مشاريع مولّدة برمجياً — بديل مؤقت حتى تضيف صورك (ضع مسار الصورة بدلها لاحقاً).
+/**
+ * Generative cover art — used only when a project has no `cover` image.
+ * Deterministic per project so it is stable between visits.
+ */
 const cache = new Map<string, HTMLCanvasElement>()
 
-function rand(seed: number) {
-  let s = seed
-  return () => {
-    s = (s * 16807) % 2147483647
-    return (s - 1) / 2147483646
-  }
+function rng(seed: number) {
+  let s = seed % 2147483647
+  if (s <= 0) s += 2147483646
+  return () => (s = (s * 16807) % 2147483647) / 2147483647
 }
+const seedOf = (str: string) => [...str].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7)
 
-export function makeCover(p: Project, w = 1024, h = 1280): HTMLCanvasElement {
-  const key = `${p.id}-${w}x${h}`
+export function drawCover(p: Project, w = 1200, h = 1500): HTMLCanvasElement {
+  const key = `${p.slug}-${w}x${h}`
   const hit = cache.get(key)
   if (hit) return hit
   const c = document.createElement('canvas')
   c.width = w
   c.height = h
   const ctx = c.getContext('2d')!
-  const [bg, a, b] = p.colors
-  const r = rand(Number(p.id) * 9973 + 7)
+  const [bg, accent, light] = p.palette
+  const r = rng(seedOf(p.slug))
+  const cx = w / 2
+  const cy = h * 0.46
+  const R = Math.min(w, h) * 0.32
 
   ctx.fillStyle = bg
   ctx.fillRect(0, 0, w, h)
 
-  const g = ctx.createRadialGradient(w * 0.7, h * 0.3, 0, w * 0.6, h * 0.4, w * 0.95)
-  g.addColorStop(0, a + 'cc')
-  g.addColorStop(0.55, a + '22')
+  // atmospheric light
+  const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, w * 0.9)
+  g.addColorStop(0, accent + '55')
+  g.addColorStop(0.45, accent + '14')
   g.addColorStop(1, bg + '00')
   ctx.fillStyle = g
   ctx.fillRect(0, 0, w, h)
 
-  ctx.strokeStyle = b
-  ctx.fillStyle = b
-  const cx = w * 0.5
-  const cy = h * 0.46
+  ctx.save()
   switch (p.motif) {
-    case 'rings':
-      for (let i = 1; i < 14; i++) {
-        ctx.globalAlpha = 0.9 - i * 0.06
-        ctx.lineWidth = 2 + (i % 3)
+    case 'halo': {
+      // eclipse halo
+      for (let i = 0; i < 90; i++) {
+        ctx.globalAlpha = 0.012 + i * 0.0004
+        ctx.fillStyle = accent
+        ctx.beginPath(); ctx.arc(cx, cy, R * 1.02 + i * 2.2, 0, Math.PI * 2); ctx.fill()
+      }
+      ctx.globalAlpha = 1
+      const rim = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R)
+      rim.addColorStop(0, light); rim.addColorStop(0.5, accent); rim.addColorStop(1, light)
+      ctx.strokeStyle = rim; ctx.lineWidth = 3
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke()
+      ctx.fillStyle = bg
+      ctx.beginPath(); ctx.arc(cx, cy, R - 2, 0, Math.PI * 2); ctx.fill()
+      break
+    }
+    case 'shards': {
+      for (let i = 0; i < 46; i++) {
+        const a = r() * Math.PI * 2
+        const d = R * (0.2 + r() * 1.1)
+        const x = cx + Math.cos(a) * d
+        const y = cy + Math.sin(a) * d
+        const s = 20 + r() * 90
+        ctx.globalAlpha = 0.25 + r() * 0.7
+        const lg = ctx.createLinearGradient(x - s, y - s, x + s, y + s)
+        lg.addColorStop(0, light); lg.addColorStop(1, accent)
+        ctx.fillStyle = lg
         ctx.beginPath()
-        ctx.arc(cx, cy, i * w * 0.035, 0, Math.PI * 2)
+        ctx.moveTo(x + Math.cos(a) * s, y + Math.sin(a) * s)
+        ctx.lineTo(x + Math.cos(a + 2.2) * s * 0.6, y + Math.sin(a + 2.2) * s * 0.6)
+        ctx.lineTo(x + Math.cos(a + 4.1) * s * 0.8, y + Math.sin(a + 4.1) * s * 0.8)
+        ctx.closePath(); ctx.fill()
+      }
+      break
+    }
+    case 'orbit': {
+      ctx.strokeStyle = light
+      for (let i = 0; i < 7; i++) {
+        ctx.globalAlpha = 0.15 + i * 0.1
+        ctx.lineWidth = 1.5
+        ctx.beginPath()
+        ctx.ellipse(cx, cy, R * (0.5 + i * 0.16), R * (0.18 + i * 0.05), -0.4 + i * 0.07, 0, Math.PI * 2)
+        ctx.stroke()
+      }
+      ctx.globalAlpha = 1
+      const og = ctx.createRadialGradient(cx - 18, cy - 18, 4, cx, cy, R * 0.22)
+      og.addColorStop(0, '#fff'); og.addColorStop(0.5, accent); og.addColorStop(1, bg)
+      ctx.fillStyle = og
+      ctx.beginPath(); ctx.arc(cx, cy, R * 0.22, 0, Math.PI * 2); ctx.fill()
+      break
+    }
+    case 'grid': {
+      const step = w / 16
+      ctx.strokeStyle = light
+      ctx.globalAlpha = 0.09
+      for (let x = 0; x <= w; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke() }
+      for (let y = 0; y <= h; y += step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke() }
+      ctx.globalAlpha = 1
+      ctx.strokeStyle = accent; ctx.lineWidth = 3
+      ctx.beginPath()
+      for (let x = 0; x <= w; x += 8) {
+        const y = cy + Math.sin(x * 0.012) * R * 0.25 + Math.sin(x * 0.041) * R * 0.08
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y)
+      }
+      ctx.stroke()
+      break
+    }
+    case 'prism': {
+      for (let i = 0; i < 3; i++) {
+        ctx.globalAlpha = 0.5 - i * 0.12
+        ctx.strokeStyle = i === 1 ? accent : light
+        ctx.lineWidth = 2
+        const rr = R * (0.7 + i * 0.25)
+        ctx.beginPath()
+        for (let k = 0; k <= 3; k++) {
+          const a = -Math.PI / 2 + (k * Math.PI * 2) / 3 + i * 0.18
+          const x = cx + Math.cos(a) * rr
+          const y = cy + Math.sin(a) * rr
+          if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y)
+        }
+        ctx.stroke()
+      }
+      ctx.globalAlpha = 0.85
+      const beam = ctx.createLinearGradient(0, cy, w, cy)
+      beam.addColorStop(0, '#00000000'); beam.addColorStop(0.5, accent); beam.addColorStop(1, '#ffffff00')
+      ctx.fillStyle = beam
+      ctx.fillRect(0, cy - 2, w, 4)
+      break
+    }
+    case 'dune': {
+      for (let i = 0; i < 26; i++) {
+        ctx.globalAlpha = 0.06 + (i / 26) * 0.5
+        ctx.strokeStyle = i % 5 === 0 ? accent : light
+        ctx.lineWidth = 1.5
+        ctx.beginPath()
+        const y0 = h * 0.3 + i * (h * 0.022)
+        for (let x = 0; x <= w; x += 10) {
+          const y = y0 + Math.sin(x * 0.006 + i * 0.4) * 40 + Math.sin(x * 0.017 + i) * 10
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y)
+        }
         ctx.stroke()
       }
       break
-    case 'grid':
-      ctx.globalAlpha = 0.35
-      ctx.lineWidth = 1.5
-      for (let x = 0; x <= w; x += w / 12) {
-        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke()
-      }
-      for (let y = 0; y <= h; y += w / 12) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke()
-      }
-      ctx.globalAlpha = 1
-      ctx.fillStyle = a
-      for (let i = 0; i < 9; i++) {
-        const gx = Math.floor(r() * 12) * (w / 12)
-        const gy = Math.floor(r() * 14) * (w / 12)
-        ctx.fillRect(gx, gy, w / 12, w / 12)
-      }
-      break
-    case 'bars':
-      for (let i = 0; i < 18; i++) {
-        ctx.globalAlpha = 0.25 + r() * 0.75
-        const bh = h * (0.15 + r() * 0.6)
-        ctx.fillRect((i / 18) * w + 6, h - bh, w / 18 - 12, bh)
-      }
-      break
-    case 'orb': {
-      const og = ctx.createRadialGradient(cx - 80, cy - 100, 20, cx, cy, w * 0.34)
-      og.addColorStop(0, b)
-      og.addColorStop(0.4, a)
-      og.addColorStop(1, bg)
-      ctx.fillStyle = og
-      ctx.beginPath(); ctx.arc(cx, cy, w * 0.34, 0, Math.PI * 2); ctx.fill()
-      break
     }
-    case 'diagonal':
-      ctx.lineWidth = 26
-      for (let i = -h; i < w + h; i += 70) {
-        ctx.globalAlpha = 0.15 + ((i / 70) % 4) * 0.2
-        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i - h, h); ctx.stroke()
-      }
-      break
-    case 'dots':
-      for (let y = 40; y < h; y += 44) {
-        for (let x = 40; x < w; x += 44) {
-          const d = Math.hypot(x - cx, y - cy) / (w * 0.6)
-          ctx.globalAlpha = Math.max(0.05, 1 - d)
-          ctx.beginPath(); ctx.arc(x, y, Math.max(0.5, 9 * (1.2 - d)), 0, Math.PI * 2); ctx.fill()
-        }
-      }
-      break
   }
-  ctx.globalAlpha = 1
+  ctx.restore()
 
-  // حبيبات فيلم
+  // film grain
   const img = ctx.getImageData(0, 0, w, h)
   for (let i = 0; i < img.data.length; i += 4) {
-    const n = (r() - 0.5) * 28
+    const n = (r() - 0.5) * 18
     img.data[i] += n; img.data[i + 1] += n; img.data[i + 2] += n
   }
   ctx.putImageData(img, 0, 0)
 
-  // طباعة
-  ctx.fillStyle = '#ece8e1'
-  ctx.font = `600 ${w * 0.03}px "JetBrains Mono Variable", monospace`
-  ctx.fillText(`(${p.id})`, w * 0.06, h * 0.07)
-  ctx.textAlign = 'right'
-  ctx.fillText(p.year, w * 0.94, h * 0.07)
-  ctx.textAlign = 'left'
-  ctx.font = `600 ${w * 0.13}px "Inter Tight Variable", sans-serif`
-  ctx.fillText(p.title, w * 0.06, h * 0.9)
-  ctx.font = `500 ${w * 0.028}px "JetBrains Mono Variable", monospace`
-  ctx.globalAlpha = 0.7
-  ctx.fillText(p.category.toUpperCase(), w * 0.06, h * 0.95)
   cache.set(key, c)
   return c
 }
 
 const urlCache = new Map<string, string>()
-export function coverURL(p: Project) {
-  const hit = urlCache.get(p.id)
+/** Returns the project cover URL — the real image when provided, otherwise a generated one. */
+export function coverURL(p: Project, w = 900, h = 1125) {
+  if (p.cover) return p.cover
+  const key = `${p.slug}-${w}`
+  const hit = urlCache.get(key)
   if (hit) return hit
-  const u = makeCover(p, 640, 800).toDataURL('image/jpeg', 0.85)
-  urlCache.set(p.id, u)
+  const u = drawCover(p, w, h).toDataURL('image/jpeg', 0.86)
+  urlCache.set(key, u)
   return u
 }
