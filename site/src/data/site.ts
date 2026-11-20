@@ -4,17 +4,17 @@
  */
 export const site = {
   /** Shown on the hero: first word in outline, second in solid orange. Replace with your real name. */
-  name: ['EISSA', 'STUDIO'] as [string, string],
+  name: ['EYAS', 'DESIGN'] as [string, string],
   /** What the name decodes into once the suit is on. */
   alias: ['ALTER', 'EGO'] as [string, string],
-  brand: 'EISSA',
-  studio: 'EISSA STUDIO',
+  brand: 'Eyas Design',
+  studio: 'EYAS DESIGN',
   role: 'Brand & interface designer',
   location: 'Remote — worldwide',
   timezone: 'Asia/Amman',
   year: 2026,
   available: 'Booking Q1 2027',
-  bio: 'Brand and interface designer. Calm in the kickoff meeting. Something else entirely once the deadline is on.',
+  bio: 'Independent brand and interface designer. Calm in the kickoff meeting. Something else once the deadline is on.',
 
   /**
    * Hero portraits — put YOUR two photos in /public/hero/ and set the paths.
@@ -66,7 +66,7 @@ export const site = {
   ],
 
   seo: {
-    title: 'EISSA — Brand & interface designer',
+    title: 'Eyas Design, brand and interface designer',
     description: 'Portfolio of an independent brand and interface designer. Identities, websites and motion.',
   },
 }
