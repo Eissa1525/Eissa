@@ -32,9 +32,13 @@ export default function RootLayout() {
 
   return (
     <>
-      <a href="#main" className="label fixed top-2 left-2 z-[200] -translate-y-20 rounded bg-fg px-3 py-2 text-ink focus:translate-y-0">
+      <button
+        type="button"
+        onClick={() => { const m = document.getElementById('main'); m?.setAttribute('tabindex', '-1'); m?.focus() }}
+        className="label fixed top-2 left-2 z-[200] -translate-y-20 bg-fg px-3 py-2 text-ink focus:translate-y-0"
+      >
         Skip to content
-      </a>
+      </button>
       <Preloader />
       <Cursor />
       <div className="grain" aria-hidden />

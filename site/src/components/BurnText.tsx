@@ -26,6 +26,7 @@ export default function BurnText({ lines, className = '' }: { lines: string[]; c
     const layout = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2)
       W = el.clientWidth
+      if (W < 10) return // not laid out yet (hidden route, transition) — the ResizeObserver calls again
       const fs = Math.min(W * 0.205, 330)
       const lh = fs * 0.84
       H = Math.ceil(lh * lines.length + fs * 0.12)
@@ -102,7 +103,7 @@ export default function BurnText({ lines, className = '' }: { lines: string[]; c
 
     const tick = (now: number) => {
       raf = 0
-      if (!visible) return
+      if (!visible || !cols) return
       frame = (frame + 1) % 1000
       const idle = now - ptr.last > 2200 || !ptr.inside
       if (!idle) addHeat(ptr.x, ptr.y, Math.max(56, W * 0.055), 0.36)

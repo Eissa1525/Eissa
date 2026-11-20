@@ -8,7 +8,7 @@ let lenis: Lenis | null = null
 
 export function initLenis() {
   if (lenis || prefersReducedMotion()) return () => {}
-  lenis = new Lenis({ lerp: 0.085, anchors: true, autoRaf: false })
+  lenis = new Lenis({ lerp: 0.085, anchors: !import.meta.env.VITE_HASH_ROUTER, autoRaf: false })
   lenis.on('scroll', (l: Lenis) => {
     scroll.velocity = l.velocity
     ScrollTrigger.update()

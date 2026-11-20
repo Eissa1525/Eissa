@@ -1,9 +1,11 @@
-import { createBrowserRouter } from 'react-router'
+import { createBrowserRouter, createHashRouter } from 'react-router'
 import RootLayout from './layouts/RootLayout'
 import Home from './pages/Home'
 
 // Home is eager (the hero itself lazy-loads its 3D chunk); other routes are code-split.
-export const router = createBrowserRouter([
+// Hash routing for static hosts that cannot rewrite paths (e.g. the shareable preview build).
+const create = import.meta.env.VITE_HASH_ROUTER ? createHashRouter : createBrowserRouter
+export const router = create([
   {
     path: '/',
     element: <RootLayout />,
