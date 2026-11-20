@@ -22,12 +22,13 @@ export default function BurnText({ lines, className = '' }: { lines: string[]; c
     let heat = new Float32Array(0)
     let raf = 0, visible = false, frame = 0
     const ptr = { x: -9999, y: -9999, last: 0, inside: false }
+    const coarse = window.matchMedia('(pointer: coarse)').matches
 
     const layout = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2)
       W = el.clientWidth
       if (W < 10) return // not laid out yet (hidden route, transition) — the ResizeObserver calls again
-      const fs = Math.min(W * 0.205, 330)
+      const fs = Math.min(W * (W < 600 ? 0.235 : 0.205), 330)
       const lh = fs * 0.84
       H = Math.ceil(lh * lines.length + fs * 0.12)
       cv.width = W * dpr; cv.height = H * dpr
@@ -84,13 +85,22 @@ export default function BurnText({ lines, className = '' }: { lines: string[]; c
         const x = i % cols, y = (i / cols) | 0
         if (h > 0.62 || hash(x, y, frame) < (h - 0.3) * 3) ctx.fillRect(x * CELL, y * CELL, CELL, CELL)
       }
-      // embers on the edges of the burn
+      // fire inside the hole + embers on its edges
       ctx.globalCompositeOperation = 'source-over'
       for (let i = 0; i < heat.length; i++) {
         const h = heat[i]
-        if (h < 0.22 || h > 0.95) continue
+        if (h < 0.22) continue
         const x = i % cols, y = (i / cols) | 0
         const r = hash(x, y, frame)
+        if (h > 0.62) {
+          if (r < 0.5 + (h - 0.62) * 0.7) {
+            ctx.fillStyle = h > 1.12 && r < 0.3 ? '#fff3e2'
+              : mask[i] ? (r < 0.07 ? '#38ff9c' : r < 0.15 ? '#ff2d6f' : r < 0.62 ? '#ff4a1c' : '#ff9a2e')
+              : r < 0.35 ? '#b82c14' : '#4a1208'
+            ctx.fillRect(x * CELL, y * CELL, CELL, CELL)
+          }
+          continue
+        }
         if (mask[i] && r < 0.5) {
           ctx.fillStyle = h > 0.6 && r < 0.12 ? '#31a8ff' : `rgba(255,${90 + ((r * 120) | 0)},31,${0.55 + r})`
           ctx.fillRect(x * CELL, y * CELL, CELL - 1, CELL - 1)
@@ -106,11 +116,11 @@ export default function BurnText({ lines, className = '' }: { lines: string[]; c
       if (!visible || !cols) return
       frame = (frame + 1) % 1000
       const idle = now - ptr.last > 2200 || !ptr.inside
-      if (!idle) addHeat(ptr.x, ptr.y, Math.max(56, W * 0.055), 0.36)
+      if (!idle) addHeat(ptr.x, ptr.y, coarse ? Math.max(60, W * 0.13) : Math.max(56, W * 0.06), 0.38)
       else {
         // autonomous probe
         const t = now * 0.00035
-        addHeat(W * (0.5 + 0.42 * Math.sin(t * 1.3)), H * (0.5 + 0.38 * Math.sin(t * 2.1 + 1)), Math.max(36, W * 0.03), 0.22)
+        addHeat(W * (0.5 + 0.42 * Math.sin(t * 1.3)), H * (0.5 + 0.38 * Math.sin(t * 2.1 + 1)), coarse ? Math.max(48, W * 0.1) : Math.max(40, W * 0.035), 0.26)
       }
       for (let i = 0; i < heat.length; i++) if (heat[i] > 0) heat[i] = Math.max(0, heat[i] * 0.972 - 0.002)
       draw()
@@ -118,9 +128,11 @@ export default function BurnText({ lines, className = '' }: { lines: string[]; c
     }
     const start = () => { if (!raf && visible && !reduce) raf = requestAnimationFrame(tick) }
 
-    const onMove = (e: PointerEvent) => {
+    const onMove = (e: PointerEvent | TouchEvent) => {
       const r = cv.getBoundingClientRect()
-      ptr.x = e.clientX - r.left; ptr.y = e.clientY - r.top
+      const pt = 'touches' in e ? e.touches[0] : e
+      if (!pt) return
+      ptr.x = pt.clientX - r.left; ptr.y = pt.clientY - r.top
       ptr.inside = ptr.x > -80 && ptr.y > -80 && ptr.x < r.width + 80 && ptr.y < r.height + 80
       ptr.last = performance.now()
       start()
@@ -130,11 +142,19 @@ export default function BurnText({ lines, className = '' }: { lines: string[]; c
     document.fonts?.ready.then(() => layout())
     layout()
     io.observe(el); ro.observe(el)
+    const onTap = (e: PointerEvent) => {
+      onMove(e)
+      if (ptr.inside) addHeat(ptr.x, ptr.y, coarse ? W * 0.16 : W * 0.08, 0.9) // burst
+    }
     window.addEventListener('pointermove', onMove, { passive: true })
+    window.addEventListener('touchmove', onMove, { passive: true })
+    cv.addEventListener('pointerdown', onTap)
     return () => {
       cancelAnimationFrame(raf)
       io.disconnect(); ro.disconnect()
       window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('touchmove', onMove)
+      cv.removeEventListener('pointerdown', onTap)
     }
   }, [lines])
 

@@ -17,7 +17,10 @@ export default function Transmit() {
         <span className="flex items-center gap-2"><i className="dot-live" />{site.available}</span>
       </div>
       <h2 id="transmit-title" className="sr-only">{LINES.join(' ')}</h2>
-      <BurnText lines={LINES} className="mt-10" />
+      <div className="relative mt-10">
+        <div className="pointer-events-none absolute -inset-x-[var(--pad)] -inset-y-10 bg-[radial-gradient(rgb(49_168_255/0.16)_1px,transparent_1.2px)] bg-[size:14px_14px] [mask-image:radial-gradient(80%_70%_at_50%_50%,#000_30%,transparent)]" aria-hidden />
+        <BurnText lines={LINES} className="relative" />
+      </div>
       <div className="mt-12 grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
         <div className="space-y-5" data-reveal="fade">
           <p className="max-w-xs text-sm text-dim">An idea that is hard to put into words? Write anyway — every message gets a reply.</p>

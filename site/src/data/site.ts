@@ -34,6 +34,13 @@ export const site = {
     'I spent years inside agencies learning one thing: *a brand that needs explaining is not done yet.* Now I work directly with founders — one product at a time, *no layers in between*, from the first rough idea to the files that go live.',
   journey: ['First sketch', 'Agency years', 'Lead designer', 'Independent'],
 
+  /** Shown above the brief form — change or empty it to match how fast you really reply. */
+  replyPromise: 'Reply within 2 working days',
+  briefOptions: {
+    needs: ['Brand identity', 'Website', 'Motion', 'Art direction', 'Not sure yet'],
+    budgets: ['Under $5k', '$5k – $15k', '$15k – $40k', '$40k+', 'Let’s talk'],
+  },
+
   contact: {
     /** Replace with your real address (example.com is reserved and never delivers). */
     email: 'hello@example.com',
@@ -46,9 +53,11 @@ export const site = {
     defaultMessage: 'Hi — I have a project that needs an alter ego.',
   },
 
+  /** Add your real profiles — each one becomes a card in the contact section. */
   socials: [
-    // { label: 'Instagram', href: 'https://instagram.com/yourname' },
-  ] as { label: string; href: string }[],
+    // { label: 'Instagram', handle: '@yourname', href: 'https://instagram.com/yourname' },
+    // { label: 'Behance', handle: '@yourname', href: 'https://behance.net/yourname' },
+  ] as { label: string; handle: string; href: string }[],
 
   nav: [
     { label: 'Work', to: '/work' },
