@@ -13,7 +13,7 @@ export default function Transmit() {
   return (
     <section ref={root} className="shell relative pt-[16vh] pb-10" aria-labelledby="transmit-title">
       <div className="hud flex justify-between text-faint" data-reveal="fade">
-        <span className="flex items-center gap-3"><span className="text-accent">//</span><span className="text-fg">Transmit</span></span>
+        <span className="flex items-center gap-3"><span className="text-accent" aria-hidden>//</span><span className="text-fg">Transmit</span></span>
         <span className="flex items-center gap-2"><i className="dot-live" />{site.available}</span>
       </div>
       <h2 id="transmit-title" className="sr-only">{LINES.join(' ')}</h2>

@@ -6,6 +6,7 @@ import { site } from '../../data/site'
 import { useIsMobile, useReducedMotion } from '../../hooks/useMedia'
 import { hasWebGL } from '../../hooks/webgl'
 import ErrorBoundary from '../../components/ErrorBoundary'
+import Icon from '../../components/icons/Icon'
 import Clock from '../../components/Clock'
 import type { PortraitImages } from '../../scenes/suitup/SuitUpScene'
 import { loadPortraits } from '../../scenes/suitup/loadPortraits'
@@ -145,7 +146,7 @@ export default function SuitUpHero() {
         {/* bottom HUD */}
         <div className="absolute inset-x-[calc(var(--pad)+1.25rem)] bottom-[calc(var(--pad)+1.25rem)] grid items-end gap-6 md:grid-cols-[1fr_auto_1fr]">
           <p className="su-fade max-w-[19rem] text-sm leading-relaxed text-dim">{site.bio}</p>
-          <p className="su-cue su-fade hud hidden text-faint md:block">Scroll to shift <span className="inline-block animate-blink">↓</span></p>
+          <p className="su-cue su-fade hud hidden text-faint md:block"><span className="inline-flex items-center gap-2">Scroll to shift <Icon name="arrow-down" className="size-3.5 animate-blink" /></span></p>
           <div className="su-fade hud grid w-full max-w-[18rem] gap-2 justify-self-end text-faint max-md:justify-self-start">
             <div className="flex justify-between"><span>Sync</span><span className="su-sync text-accent">000%</span></div>
             <div className="h-px bg-line"><i className="su-bar block h-full origin-left scale-x-0 bg-accent" /></div>

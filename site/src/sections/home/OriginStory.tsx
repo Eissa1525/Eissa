@@ -42,7 +42,7 @@ export default function OriginStory() {
   return (
     <section ref={root} id="about" className="shell py-[22vh]" aria-labelledby="origin-title">
       <div className="hud mb-12 flex items-center gap-3 text-faint">
-        <span className="text-accent">//</span><span id="origin-title" className="text-fg">Origin</span><span className="os-pct">000%</span>
+        <span className="text-accent" aria-hidden>//</span><h2 id="origin-title" className="text-fg">Origin</h2><span className="os-pct tabular-nums">000%</span>
       </div>
       <p className="os-text max-w-[26ch] text-[clamp(1.9rem,1rem+3.6vw,4.4rem)] leading-[1.06] font-medium tracking-[-0.03em]">
         <Rich text={site.origin} />

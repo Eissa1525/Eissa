@@ -23,8 +23,8 @@ export default function CaseStudy() {
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/30 to-transparent" />
         <div className="shell relative w-full pb-12">
-          <p className="label text-accent" data-reveal="fade">{project.index} — {project.client}</p>
-          <h1 data-reveal="lines" className="display-wide text-metal mt-4 text-mega leading-[0.85]">{project.title}</h1>
+          <h1 data-reveal="lines" className="display-wide text-metal text-mega leading-[0.85]">{project.title}</h1>
+          <p className="hud mt-5 flex flex-wrap gap-x-4 gap-y-1 text-dim" data-reveal="fade"><span className="text-accent">{project.index}</span><span>{project.client}</span><span>{project.year}</span></p>
         </div>
       </header>
 

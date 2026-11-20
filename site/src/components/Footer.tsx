@@ -17,7 +17,7 @@ export default function Footer() {
           ))}
         </nav>
         <span>{site.location} · <Clock /></span>
-        <button type="button" className="roll" data-text="Top ↑" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}><span>Top ↑</span></button>
+        <button type="button" className="roll" data-text="Back to top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}><span>Back to top</span></button>
       </div>
     </footer>
   )

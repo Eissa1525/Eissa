@@ -12,7 +12,7 @@
   --color-panel-3: #1a1b21;
   --color-fg: #ededf0;
   --color-dim: rgb(237 237 240 / 0.62);
-  --color-faint: rgb(237 237 240 / 0.36);
+  --color-faint: rgb(237 237 240 / 0.52); /* ≥4.5:1 on ink */
   --color-accent: #ff5a1f;
   --color-accent-dim: rgb(255 90 31 / 0.35);
   --color-signal: #31a8ff;
@@ -55,6 +55,14 @@
     overflow-x: clip;
   }
   ::selection { background: var(--color-accent); color: var(--color-ink); }
+  html { scrollbar-color: rgb(237 237 240 / 0.22) var(--color-ink); scrollbar-width: thin; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--color-ink); }
+  ::-webkit-scrollbar-thumb { background: rgb(237 237 240 / 0.2); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
+  input, textarea, select { caret-color: var(--color-accent); }
+  a { text-underline-offset: 0.22em; text-decoration-thickness: 1px; }
+  .tabular-nums, .hud { font-variant-numeric: tabular-nums; }
   :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: 2px; }
   img { display: block; max-width: 100%; }
 }
@@ -132,7 +140,10 @@
 .cursor-ring span { opacity: 0; visibility: hidden; color: var(--color-ink); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; }
 html:not(.has-cursor) .cursor-dot, html:not(.has-cursor) .cursor-ring { display: none; }
 
+/* Reduced motion: components switch to static states themselves (scroll scenes, WebGL, burn text);
+   here only ambient loops stop and long transitions shorten — state changes stay visible. */
 @media (prefers-reduced-motion: reduce) {
-  .grain { animation: none; }
-  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  .grain, .animate-blink { animation: none; }
+  .roll > span, .roll::after { transition: none; }
+  html { scroll-behavior: auto; }
 }
