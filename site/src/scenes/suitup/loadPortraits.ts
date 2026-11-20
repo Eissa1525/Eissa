@@ -1,4 +1,5 @@
 import { site } from '../../data/site'
+import { asset } from '../../lib/asset'
 import { drawCivilian, drawSuited } from './placeholders'
 import type { PortraitImages } from './SuitUpScene'
 
@@ -8,16 +9,20 @@ function loadImage(src: string) {
     img.decoding = 'async'
     img.onload = () => resolve(img)
     img.onerror = reject
-    img.src = src
+    img.src = asset(src)
   })
 }
 
-/** Real photos when configured, otherwise the procedural placeholder figures. */
+/**
+ * civilian + suited photos → crossfade between two real images.
+ * civilian only → the shader builds the suit from that photo (procedural mode).
+ * neither → drawn placeholder figures.
+ */
 export async function loadPortraits(): Promise<PortraitImages> {
   const { civilian, suited } = site.portraits
-  const [civil, suit] = await Promise.all([
-    civilian ? loadImage(civilian).catch(() => drawCivilian()) : Promise.resolve(drawCivilian()),
-    suited ? loadImage(suited).catch(() => drawSuited()) : Promise.resolve(drawSuited()),
-  ])
-  return { civil, suit }
+  const civil = civilian ? await loadImage(civilian).catch(() => null) : null
+  if (!civil) return { civil: drawCivilian(), suit: drawSuited(), proc: false }
+  if (!suited) return { civil, suit: civil, proc: true }
+  const suit = await loadImage(suited).catch(() => null)
+  return suit ? { civil, suit, proc: false } : { civil, suit: civil, proc: true }
 }

@@ -83,10 +83,10 @@ export default function Preloader() {
         <span>Loading dossier</span>
       </div>
       <div className="overflow-hidden text-center">
-        <div className="pre-word display whitespace-nowrap text-[clamp(4rem,22vw,22rem)] leading-[0.82]"><span className="outline-text">{site.alias[0]}</span><span className="text-accent">{site.alias[1]}</span></div>
+        <div className="pre-word flex items-end justify-center gap-3"><span ref={num} className="display text-[clamp(5rem,15vw,12rem)] leading-[0.8] tabular-nums">000</span><span className="hud mb-2 text-accent">%</span></div>
       </div>
       <div className="pre-meta label flex items-center gap-4 text-faint">
-        <span ref={num} className="w-10 text-accent">000</span>
+        <span className="text-faint">Decrypting</span>
         <span className="pre-bar relative h-px flex-1 bg-line">
           <i className="absolute inset-0 origin-left scale-x-0 bg-accent" />
         </span>

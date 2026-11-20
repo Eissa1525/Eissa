@@ -1,4 +1,5 @@
 import type { Project } from '../data/projects'
+import { asset } from './asset'
 
 /**
  * Generative cover art — used only when a project has no `cover` image.
@@ -162,7 +163,7 @@ export function drawCover(p: Project, w = 1200, h = 1500): HTMLCanvasElement {
 const urlCache = new Map<string, string>()
 /** Returns the project cover URL — the real image when provided, otherwise a generated one. */
 export function coverURL(p: Project, w = 900, h = 1125) {
-  if (p.cover) return p.cover
+  if (p.cover) return asset(p.cover)
   const key = `${p.slug}-${w}`
   const hit = urlCache.get(key)
   if (hit) return hit

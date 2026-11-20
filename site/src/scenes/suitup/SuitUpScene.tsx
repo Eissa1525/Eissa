@@ -3,8 +3,9 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { fragment, vertex } from './suitupShader'
 import { scroll } from '../../lib/store'
+import { site } from '../../data/site'
 
-export type PortraitImages = { civil: TexImageSource; suit: TexImageSource }
+export type PortraitImages = { civil: TexImageSource; suit: TexImageSource; proc: boolean }
 type Portraits = { civil: THREE.Texture; suit: THREE.Texture }
 
 function toTexture(img: TexImageSource) {
@@ -20,8 +21,9 @@ function aspectOf(t: THREE.Texture) {
   return img.width / img.height
 }
 
-function Quad({ tex, mobile, onFirstFrame }: { tex: Portraits; mobile: boolean; onFirstFrame?: () => void }) {
+function Quad({ tex, proc, mobile, onFirstFrame }: { tex: Portraits; proc: boolean; mobile: boolean; onFirstFrame?: () => void }) {
   const { size } = useThree()
+  const m = site.portraits.suitMap
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -41,9 +43,14 @@ function Quad({ tex, mobile, onFirstFrame }: { tex: Portraits; mobile: boolean; 
           uScale: { value: 1 },
           uCenter: { value: new THREE.Vector2(0.5, 0.5) },
           uIntro: { value: 0 },
+          uProc: { value: proc ? 1 : 0 },
+          uTexel: { value: new THREE.Vector2(1 / (tex.civil.image as { width: number }).width, 1 / (tex.civil.image as { height: number }).height) },
+          uFace: { value: new THREE.Vector4(m.faceX, 1 - m.faceY, m.faceW, m.faceH) },
+          uVisor: { value: new THREE.Vector3(1 - m.visorY, m.visorHalfWidth, m.visorHalfHeight) },
+          uChest: { value: new THREE.Vector2(m.faceX, 1 - m.chestY) },
         },
       }),
-    [tex],
+    [tex, proc, m],
   )
   useEffect(() => () => material.dispose(), [material])
   const st = useRef({ p: 0, intro: 0, frames: 0 })
@@ -62,7 +69,7 @@ function Quad({ tex, mobile, onFirstFrame }: { tex: Portraits; mobile: boolean; 
     u.uMouse.value.x = THREE.MathUtils.damp(u.uMouse.value.x, mobile ? 0 : state.pointer.x, 3, dt)
     u.uMouse.value.y = THREE.MathUtils.damp(u.uMouse.value.y, mobile ? 0 : state.pointer.y, 3, dt)
     const portrait = size.width / size.height < 0.9
-    u.uScale.value = portrait ? 0.74 : 1.04
+    u.uScale.value = portrait ? 0.8 : 1.06
     u.uCenter.value.set(portrait ? 0.5 : 0.47, portrait ? 0.55 : 0.48)
   })
 
@@ -74,8 +81,11 @@ function Quad({ tex, mobile, onFirstFrame }: { tex: Portraits; mobile: boolean; 
 }
 
 export default function SuitUpScene({ images, mobile, onFirstFrame }: { images: PortraitImages; mobile: boolean; onFirstFrame?: () => void }) {
-  const tex = useMemo<Portraits>(() => ({ civil: toTexture(images.civil), suit: toTexture(images.suit) }), [images])
-  useEffect(() => () => { tex.civil.dispose(); tex.suit.dispose() }, [tex])
+  const tex = useMemo<Portraits>(() => {
+    const civil = toTexture(images.civil)
+    return { civil, suit: images.proc ? civil : toTexture(images.suit) }
+  }, [images])
+  useEffect(() => () => { tex.civil.dispose(); if (tex.suit !== tex.civil) tex.suit.dispose() }, [tex])
   return (
     <Canvas
       className="!absolute inset-0"
@@ -86,7 +96,7 @@ export default function SuitUpScene({ images, mobile, onFirstFrame }: { images: 
       orthographic
       aria-hidden
     >
-      <Quad tex={tex} mobile={mobile} onFirstFrame={onFirstFrame} />
+      <Quad tex={tex} proc={images.proc} mobile={mobile} onFirstFrame={onFirstFrame} />
     </Canvas>
   )
 }

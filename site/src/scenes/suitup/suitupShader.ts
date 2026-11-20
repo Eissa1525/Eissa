@@ -16,6 +16,11 @@ uniform vec2 uMouse;
 uniform float uScale;   // portrait height as a fraction of the viewport
 uniform vec2 uCenter;   // portrait centre in screen uv
 uniform float uIntro;   // 0..1 fade-in after preloader
+uniform float uProc;    // 1 = build the alter ego procedurally from the civilian photo
+uniform vec2 uTexel;    // 1 / civilian texture size
+uniform vec4 uFace;     // face ellipse in image uv: centre.xy, radius.xy
+uniform vec3 uVisor;    // visor: y, half-width, half-height (image uv)
+uniform vec2 uChest;    // chest emblem centre (image uv)
 varying vec2 vUv;
 
 float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -24,6 +29,64 @@ float noise(vec2 p){
   return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y);
 }
 float fbm(vec2 p){ float v = 0.0, a = 0.5; for (int i = 0; i < 5; i++){ v += a * noise(p); p *= 2.03; a *= 0.5; } return v; }
+float lum(vec3 c){ return dot(c, vec3(0.299, 0.587, 0.114)); }
+float L(vec2 q){ return lum(texture2D(tCivil, q).rgb); }
+float blurL(vec2 q, float r){
+  float s = L(q) * 0.2;
+  for (int i = 0; i < 8; i++){ float a = float(i) * 0.7854; s += L(q + vec2(cos(a), sin(a)) * uTexel * r) * 0.1; }
+  return s;
+}
+
+// The alter ego, generated from the real photo: a tactical hologram — halftone body,
+// orange silhouette glow, visor, chest emblem and travelling scanlines.
+vec3 proceduralSuit(vec2 q, float t){
+  vec3 orange = vec3(1.0, 0.353, 0.122);
+  vec3 steel = vec3(0.42, 0.58, 0.86);
+  float s6 = blurL(q, 6.0);
+  float subject = smoothstep(0.03, 0.085, s6);
+  vec2 fd = (q - uFace.xy) / uFace.zw;
+  float face = 1.0 - smoothstep(0.85, 1.0, length(fd));
+
+  // halftone dots on a screen-space grid, size driven by the (smoothed) light
+  float l = blurL(q, 3.0);
+  float cell = 5.0;
+  vec2 g = gl_FragCoord.xy / cell;
+  vec2 c = fract(g) - 0.5;
+  float r = sqrt(clamp(l * 1.25, 0.0, 1.0)) * 0.62;
+  float dotMask = 1.0 - smoothstep(r - 0.12, r, length(c));
+  vec3 col = vec3(0.012, 0.02, 0.035);
+  col += mix(steel * 0.55, vec3(0.86, 0.93, 1.0), smoothstep(0.45, 0.85, l)) * dotMask * subject;
+
+  // silhouette glow (edge of the subject mask at large scale)
+  float s18 = smoothstep(0.03, 0.085, blurL(q, 18.0));
+  float rim = clamp(s18 * (1.0 - s18) * 4.0, 0.0, 1.0);
+  col += orange * rim * 1.1;
+
+  // travelling scanlines + flicker
+  float scanl = smoothstep(0.92, 1.0, sin(q.y * 220.0 - t * 5.0)) * 0.25;
+  col += steel * scanl * subject;
+  col *= 0.92 + 0.08 * sin(t * 13.0 + q.y * 7.0);
+
+  // helmet ridge
+  float ridge = (1.0 - smoothstep(0.0, 0.0035, abs(q.x - uFace.x))) * step(uVisor.x + 0.025, q.y) * face;
+  col += orange * ridge * 1.2;
+
+  // visor (curved with the face)
+  float dx = (q.x - uFace.x) / uVisor.y;
+  float vy = uVisor.x - 0.018 * dx * dx;
+  float visor = (1.0 - smoothstep(0.85, 1.0, abs(dx))) * (1.0 - smoothstep(uVisor.z * 0.6, uVisor.z, abs(q.y - vy)));
+  float core = (1.0 - smoothstep(0.7, 0.95, abs(dx))) * (1.0 - smoothstep(0.0, uVisor.z * 0.35, abs(q.y - vy)));
+  float halo = exp(-pow((q.y - vy) / (uVisor.z * 3.0), 2.0)) * (1.0 - smoothstep(0.9, 1.5, abs(dx)));
+  col = mix(col, orange * 1.1, visor);
+  col += vec3(1.0, 0.82, 0.68) * core + orange * halo * 0.5;
+
+  // chest emblem
+  float cd = length((q - uChest) * vec2(1.0, 1.5));
+  float ring = 1.0 - smoothstep(0.0, 0.005, abs(cd - 0.05));
+  col += vec3(0.19, 0.66, 1.0) * (ring * 1.5 + exp(-cd * 26.0) * 0.45) * subject;
+
+  return col * max(subject, rim);
+}
 
 vec2 portraitUV(vec2 p, float aspect){
   vec2 size = vec2(uRes.y * uScale * aspect, uRes.y * uScale);
@@ -69,10 +132,12 @@ void main(){
   float luma = dot(a, vec3(0.299, 0.587, 0.114));
   vec3 civ = vec3(pow(luma, 1.08)) * vec3(0.96, 0.97, 1.0);
   vec3 suit = b * 1.05;
+  float revealPre = smoothstep(-0.002, 0.002, d);
+  if (uProc > 0.5) suit = (revealPre > 0.0 && inside(qa) > 0.0) ? proceduralSuit(qa, t) : vec3(0.0);
 
   float reveal = smoothstep(-0.002, 0.002, d);
   float ma = inside(qa) * edgeMask(qa);
-  float mb = inside(qb) * edgeMask(qb);
+  float mb = uProc > 0.5 ? ma : inside(qb) * edgeMask(qb);
   vec3 img = mix(civ, suit, reveal);
   float m = mix(ma, mb, reveal) * uIntro;
   col = mix(col, img, m);

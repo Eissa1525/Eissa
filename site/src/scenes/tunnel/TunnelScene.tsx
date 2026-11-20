@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { projects } from '../../data/projects'
-import { drawCover } from '../../lib/covers'
+import { coverURL, drawCover } from '../../lib/covers'
 import { scroll } from '../../lib/store'
 import { DEPTH, GAP, START_Z } from './config'
 
@@ -21,6 +21,7 @@ void main(){
 `
 const screenFragment = /* glsl */ `
 uniform sampler2D uMap;
+uniform vec2 uFit;
 uniform float uShift;
 uniform float uTime;
 uniform float uHover;
@@ -28,9 +29,11 @@ varying vec2 vUv;
 varying float vFog;
 float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 void main(){
-  vec2 uv = (vUv - 0.5) * (1.0 - uHover * 0.05) + 0.5;
+  vec2 uv = (vUv - 0.5) * uFit * (1.0 - uHover * 0.05) + 0.5;
   float s = uShift + 0.0015;
   vec3 c = vec3(texture2D(uMap, uv + vec2(s, 0.0)).r, texture2D(uMap, uv).g, texture2D(uMap, uv - vec2(s, 0.0)).b);
+  float g = dot(c, vec3(0.299, 0.587, 0.114));
+  c = mix(vec3(g), c, 0.25 + uHover * 0.75) * 0.92;                 // muted, colour returns on hover
   c *= 0.9 + 0.1 * sin(vUv.y * 480.0 + uTime * 6.0);           // scanlines
   c += (hash(vUv * 900.0 + uTime) - 0.5) * 0.05;              // noise
   float edge = max(step(vUv.x, 0.004) + step(0.996, vUv.x), step(vUv.y, 0.006) + step(0.994, vUv.y));
@@ -45,11 +48,22 @@ function Screen({ index, onOpen }: { index: number; onOpen: (i: number) => void 
   const material = useMemo(() => {
     const tex = new THREE.CanvasTexture(drawCover(p, 1024, 640))
     tex.colorSpace = THREE.SRGBColorSpace
-    return new THREE.ShaderMaterial({
+    const mat = new THREE.ShaderMaterial({
       vertexShader: screenVertex,
       fragmentShader: screenFragment,
-      uniforms: { uMap: { value: tex }, uShift: { value: 0 }, uBend: { value: 0 }, uTime: { value: 0 }, uHover: { value: 0 } },
+      uniforms: { uMap: { value: tex }, uFit: { value: new THREE.Vector2(1, 1) }, uShift: { value: 0 }, uBend: { value: 0 }, uTime: { value: 0 }, uHover: { value: 0 } },
     })
+    if (p.cover) {
+      new THREE.TextureLoader().load(coverURL(p), (img) => {
+        img.colorSpace = THREE.SRGBColorSpace
+        const a = (img.image as HTMLImageElement).width / (img.image as HTMLImageElement).height
+        const plane = 3.4 / 2.125
+        mat.uniforms.uFit.value.set(a > plane ? plane / a : 1, a > plane ? 1 : a / plane) // object-fit: cover
+        ;(mat.uniforms.uMap.value as THREE.Texture).dispose()
+        mat.uniforms.uMap.value = img
+      })
+    }
+    return mat
   }, [p])
   useEffect(() => () => { (material.uniforms.uMap.value as THREE.Texture).dispose(); material.dispose() }, [material])
   const side = index % 2 === 0 ? -1 : 1
