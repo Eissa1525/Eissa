@@ -13,8 +13,11 @@ import { loadPortraits } from '../../scenes/suitup/loadPortraits'
 
 gsap.registerPlugin(ScrambleTextPlugin)
 
-const scenePromise = () => import('../../scenes/suitup/SuitUpScene')
-const SuitUpScene = lazy(scenePromise)
+// With your own photos the photo transformation runs; without them, the original 3D suit-up scene.
+const usePhotos = !!site.portraits.civilian
+const scenePromise = () => (usePhotos ? import('../../scenes/suitup/SuitUpScene') : import('../../scenes/helmet/HelmetScene'))
+const SuitUpScene = lazy(() => import('../../scenes/suitup/SuitUpScene'))
+const HelmetScene = lazy(() => import('../../scenes/helmet/HelmetScene'))
 const GLYPHS = '01<>/\\[]{}#*+=—_'
 
 /** Static fallback (reduced motion / no WebGL): split portrait, civilian left — suited right. */
@@ -47,7 +50,7 @@ export default function SuitUpHero() {
   // genuine loading work → preloader progress
   useEffect(() => {
     let alive = true
-    loading.track(loadPortraits().then((imgs) => { if (alive) setImages(imgs) }))
+    if (usePhotos) loading.track(loadPortraits().then((imgs) => { if (alive) setImages(imgs) }))
     if (use3D) {
       loading.track(scenePromise())
       loading.track(new Promise<void>((res) => { firstFrame.current = res; setTimeout(res, 7000) }))
@@ -111,7 +114,13 @@ export default function SuitUpHero() {
     { scope: root, dependencies: [reduced] },
   )
 
-  const scene = use3D && images ? (
+  const scene = !usePhotos ? (
+    use3D ? (
+      <ErrorBoundary fallback={null}>
+        <Suspense fallback={null}>{active && <HelmetScene mobile={mobile} onFirstFrame={onFirstFrame} />}</Suspense>
+      </ErrorBoundary>
+    ) : null
+  ) : use3D && images ? (
     <ErrorBoundary fallback={<StaticPortraits images={images} />}>
       <Suspense fallback={null}>{active && <SuitUpScene images={images} mobile={mobile} onFirstFrame={onFirstFrame} />}</Suspense>
     </ErrorBoundary>

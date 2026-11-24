@@ -23,8 +23,8 @@ export const site = {
    * Leave empty to use the built-in placeholder figures.
    */
   portraits: {
-    civilian: 'media/portrait.jpg', // placeholder model photo (Unsplash License) — replace with yours
-    suited: '', // empty → the suit is generated from the civilian photo by the shader
+    civilian: '', // empty → the original 3D suit-up scene (no photo needed)
+    suited: '', // with only a civilian photo, the shader builds the suit from it
     /** Landmarks for the generated suit, as fractions of the photo (0 = left/top, 1 = right/bottom). */
     suitMap: { faceX: 0.5, faceY: 0.27, faceW: 0.235, faceH: 0.26, visorY: 0.297, visorHalfWidth: 0.165, visorHalfHeight: 0.021, chestY: 0.74 },
   },
