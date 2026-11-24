@@ -54,7 +54,7 @@ export default function Abilities() {
   const s = services[active]
   return (
     <section ref={root} className="shell py-[18vh]" aria-labelledby="abilities-title">
-      <SectionLabel meta={`${String(services.length).padStart(2, '0')} abilities`}><span id="abilities-title">Abilities</span></SectionLabel>
+      <SectionLabel id="abilities-title" meta={`${String(services.length).padStart(2, '0')} abilities`}>Abilities</SectionLabel>
       <div className="mt-12 grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-start">
         <ul className="border-t border-line" onMouseEnter={() => (paused.current = true)} onMouseLeave={() => (paused.current = false)}>
           {services.map((sv, i) => (

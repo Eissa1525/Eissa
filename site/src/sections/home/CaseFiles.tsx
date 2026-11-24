@@ -19,7 +19,7 @@ const pad = (n: number) => String(n).padStart(2, '0')
 function StaticFiles() {
   return (
     <section className="shell py-[16vh]" aria-labelledby="files-title">
-      <SectionLabel meta={`${pad(projects.length)} records`}><span id="files-title">Case files</span></SectionLabel>
+      <SectionLabel id="files-title" meta={`${pad(projects.length)} records`}>Case files</SectionLabel>
       <ul className="mt-10 grid gap-10 md:grid-cols-2">
         {projects.map((p) => (
           <li key={p.slug}>
@@ -89,7 +89,7 @@ export default function CaseFiles() {
         </ErrorBoundary>
 
         <div className="shell pointer-events-none absolute inset-x-0 top-20 md:top-24">
-          <SectionLabel meta={`${pad(projects.length)} records`}><span id="files-title">Case files</span></SectionLabel>
+          <SectionLabel id="files-title" meta={`${pad(projects.length)} records`}>Case files</SectionLabel>
         </div>
 
         <div className="shell absolute inset-x-0 bottom-[max(2rem,6vh)]">

@@ -1,5 +1,6 @@
 import { useId, useState, type FormEvent } from 'react'
 import { site } from '../data/site'
+import Icon from './icons/Icon'
 
 const field = 'w-full border border-line bg-panel px-4 py-3.5 text-base text-fg outline-none transition-colors placeholder:text-faint focus:border-accent'
 
@@ -37,7 +38,7 @@ export default function BriefForm() {
           <select id={`${id}-${name}`} name={name} className={`${field} appearance-none pr-10`} defaultValue={opts[0]}>
             {opts.map((o) => <option key={o} className="bg-panel">{o}</option>)}
           </select>
-          <span className="pointer-events-none absolute right-4 bottom-4 text-accent" aria-hidden>⌄</span>
+          <span className="pointer-events-none absolute right-4 bottom-4 text-accent" aria-hidden><Icon name="chevron-down" /></span>
         </div>
       ))}
       <div className="sm:col-span-2"><L htmlFor={`${id}-brief`}>The brief</L><textarea id={`${id}-brief`} name="brief" required rows={5} placeholder="What is the product, and why is it hard to explain?" className={`${field} resize-none`} /></div>

@@ -22,10 +22,10 @@ export default function OriginStory() {
       const q = gsap.utils.selector(root)
       const split = SplitText.create(q('.os-text'), { type: 'words' })
       const tl = gsap.timeline({ defaults: { ease: 'none' } })
-      tl.fromTo(split.words, { opacity: 0.13 }, { opacity: 1, stagger: 0.04, duration: 0.4 }, 0)
+      tl.fromTo(split.words, { opacity: 0.45 }, { opacity: 1, stagger: 0.04, duration: 0.4 }, 0) // readable at rest (≥3:1), brightens on scroll
         .fromTo(q('.os-line'), { scaleX: 0 }, { scaleX: 1, duration: split.words.length * 0.04 + 0.4 }, 0)
       q('.os-stop').forEach((el, i, all) =>
-        tl.fromTo(el, { opacity: 0.3 }, { opacity: 1, duration: 0.05 }, ((split.words.length * 0.04 + 0.4) * i) / (all.length - 1 || 1)),
+        tl.fromTo(el, { opacity: 0.6 }, { opacity: 1, duration: 0.05 }, ((split.words.length * 0.04 + 0.4) * i) / (all.length - 1 || 1)),
       )
       const pct = q('.os-pct')[0]
       ScrollTrigger.create({
@@ -42,7 +42,7 @@ export default function OriginStory() {
   return (
     <section ref={root} id="about" className="shell py-[22vh]" aria-labelledby="origin-title">
       <div className="hud mb-12 flex items-center gap-3 text-faint">
-        <span className="text-accent">//</span><span id="origin-title" className="text-fg">Origin</span><span className="os-pct">000%</span>
+        <span className="text-accent" aria-hidden>//</span><h2 id="origin-title" className="text-fg">Origin</h2><span className="os-pct tabular-nums">000%</span>
       </div>
       <p className="os-text max-w-[26ch] text-[clamp(1.9rem,1rem+3.6vw,4.4rem)] leading-[1.06] font-medium tracking-[-0.03em]">
         <Rich text={site.origin} />
