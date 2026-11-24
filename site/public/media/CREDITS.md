@@ -5,7 +5,6 @@ They are placeholders for real project imagery.
 
 | File | Unsplash image id |
 |---|---|
-| portrait.jpg | photo-1506794778202-cad84cf45f1d |
 | umbra.jpg | photo-1618366712010-f4ae9c647dcb |
 | meridian.jpg | photo-1551288049-bebda4e38f71 |
 | halide.jpg | photo-1565193566173-7a0ee3dbe261 |
